@@ -49,13 +49,21 @@ public class Main {
     System.out.println("---> " + ZonedDateTime.now().format(dtf));
     ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
 
-
-    for (int i = 0; i < 4; i++) {
-      executor.schedule(() -> System.out.println(
-        ZonedDateTime.now().format(dtf)), 2 * (i + 1), TimeUnit.SECONDS
-      );
+    var scheduleTask = executor.scheduleWithFixedDelay(
+      () -> System.out.println(ZonedDateTime.now().format(dtf)), 2, 2,
+      TimeUnit.SECONDS
+    );
+    long time = System.currentTimeMillis();
+    while (!scheduleTask.isDone()) {
+      try {
+        TimeUnit.SECONDS.sleep(2);
+        if ((System.currentTimeMillis() - time) / 1000 > 10) {
+          scheduleTask.cancel(true);
+        }
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
     }
-
     executor.shutdown();
   }
 }
