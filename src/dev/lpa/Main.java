@@ -49,7 +49,7 @@ public class Main {
     Runnable dateTask = () -> {
       try {
         TimeUnit.SECONDS.sleep(3);
-        System.out.println(ZonedDateTime.now().format(dtf));
+        System.out.println("a " + ZonedDateTime.now().format(dtf));
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
@@ -58,10 +58,16 @@ public class Main {
     System.out.println("---> " + ZonedDateTime.now().format(dtf));
     ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
 
-    var scheduleTask = executor.scheduleWithFixedDelay(
-      dateTask, 2, 2,
+    var scheduleTask = executor.scheduleAtFixedRate(
+      dateTask, 2, 2, // total delay is 2 + 3 the time runnable takes
       TimeUnit.SECONDS
     );
+
+    var scheduleTask2 = executor.scheduleAtFixedRate(
+      () -> System.out.println("b " + ZonedDateTime.now().format(dtf)), 2, 2,
+      TimeUnit.SECONDS
+    );
+
     long time = System.currentTimeMillis();
     while (!scheduleTask.isDone()) {
       try {
