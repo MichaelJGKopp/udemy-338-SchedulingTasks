@@ -46,11 +46,20 @@ public class Main {
       threadPool.shutdown();
     }
 
+    Runnable dateTask = () -> {
+      try {
+        TimeUnit.SECONDS.sleep(3);
+        System.out.println(ZonedDateTime.now().format(dtf));
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    };
+
     System.out.println("---> " + ZonedDateTime.now().format(dtf));
     ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
 
     var scheduleTask = executor.scheduleWithFixedDelay(
-      () -> System.out.println(ZonedDateTime.now().format(dtf)), 2, 2,
+      dateTask, 2, 2,
       TimeUnit.SECONDS
     );
     long time = System.currentTimeMillis();
